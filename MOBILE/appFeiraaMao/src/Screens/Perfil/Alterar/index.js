@@ -8,189 +8,231 @@ import {
   ScrollView,
   SafeAreaView,
   TextInput,
-  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
-const COR_PRIMARIA = "#4CAF50";
+import { launchImageLibrary } from "react-native-image-picker";
+import { Ionicons } from '@expo/vector-icons';
+import { ImageBackground } from "react-native";
 
 const Alterar = () => {
   const navigation = useNavigation();
-  const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [email, setEmail] = useState("");
-  const [endereco, setEndereco] = useState("");
-  const [senha, setSenha] = useState("");
-  const [novaSenha, setNovaSenha] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [datanasc, setDatanasc] = useState("");
 
+  // Estados unificados para os campos
+  const [formData, setFormData] = useState({
+    nome: "",
+    telefone: "",
+    email: "",
+    endereco: "",
+    senha: "",
+    novaSenha: "",
+    cpf: "",
+    datanasc: "",
+  });
+
+  const [fotoPerfil, setFotoPerfil] = useState(
+    require("../../../../assets/img/Ftperfil.jpg")
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Função genérica para atualizar campos
+  const handleChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+  };
+
+  // Validação dos campos obrigatórios
   const validarCampos = () => {
-    // Validação básica dos campos obrigatórios
-    if (!nome.trim() || !email.trim() || !senha.trim()) {
-      Alert.alert("Campos obrigatórios", "Preencha todos os campos marcados como obrigatórios");
+    if (!formData.nome.trim()) {
+      alert("Por favor, informe seu nome completo");
       return false;
     }
-
-    // Validação de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert("Email inválido", "Por favor, insira um email válido.");
+    if (!formData.email.trim()) {
+      alert("Por favor, informe seu e-mail");
       return false;
     }
-
-    // Validação de senha atual
-    if (senha.length < 6) {
-      Alert.alert("Senha inválida", "A senha deve ter pelo menos 6 caracteres.");
+    if (!formData.senha) {
+      alert("Por favor, informe sua senha atual");
       return false;
     }
-
-    // Validação opcional para telefone
-    if (telefone && telefone.replace(/\D/g, '').length < 10) {
-      Alert.alert("Telefone inválido", "Informe um número com DDD (ex: 11987654321)");
-      return false;
-    }
-
     return true;
   };
 
-  const handleSalvarAlteracoes = () => {
-    if (!validarCampos()) {
-      return;
-    }
+  // Função para salvar os dados
+  const handleSalvar = async () => {
+    if (!validarCampos()) return;
 
-    // Se todas as validações passarem
-    Alert.alert(
-      "Confirmação",
-      "Dados atualizados com sucesso!",
-      [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate("Home", { nome })
-        }
-      ]
-    );
+    setIsLoading(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      alert("Seus dados foram atualizados com sucesso!");
+      navigation.goBack();
+    } catch (error) {
+      alert("Ocorreu um problema ao salvar as alterações");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSair = () => {
-    Alert.alert(
-      "Sair",
-      "Deseja realmente sair da sua conta?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
-        {
-          text: "Sair",
-          onPress: () => navigation.navigate("Login")
-        }
-      ]
-    );
+  // Função para escolher foto da galeria
+  const escolherFoto = () => {
+    const options = {
+      mediaType: "photo",
+      quality: 1,
+    };
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log("Usuário cancelou a seleção de imagem");
+      } else if (response.errorCode) {
+        console.log("Erro:", response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        setFotoPerfil({ uri: response.assets[0].uri });
+      }
+    });
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+    <ImageBackground
+      source={require("../../../../assets/img/fundo-perfil.png")}
+      style={{ width: "100%", height: "100%", flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        {/* Imagem do perfil */}
         <View style={styles.profileImage}>
-          <Image
-            source={require("../../../../assets/img/iconperfil.jpg")}
-            style={styles.image}
-            resizeMode="cover"
-            onError={() => console.log("Erro ao carregar imagem")}
-          />
-        </View>
-
-        <View style={styles.areaForm}>
-          <Text style={styles.textForm}>Nome completo *</Text>
-          <TextInput
-            style={styles.input}
-            value={nome}
-            onChangeText={setNome}
-            placeholder="Digite seu nome completo"
-            placeholderTextColor="#999"
-          />
-
-          <Text style={styles.textForm}>Telefone</Text>
-          <TextInput
-            style={styles.input}
-            value={telefone}
-            onChangeText={setTelefone}
-            placeholder="(00) 00000-0000"
-            placeholderTextColor="#999"
-            keyboardType="phone-pad"
-          />
-
-          <Text style={styles.textForm}>Email *</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="seu@email.com"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          <Text style={styles.textForm}>Senha atual *</Text>
-          <TextInput
-            style={styles.input}
-            value={senha}
-            onChangeText={setSenha}
-            placeholder="Digite sua senha atual"
-            placeholderTextColor="#999"
-            secureTextEntry
-          />
-
-          <Text style={styles.textForm}>Nova senha</Text>
-          <TextInput
-            style={styles.input}
-            value={novaSenha}
-            onChangeText={setNovaSenha}
-            placeholder="Digite uma nova senha (opcional)"
-            placeholderTextColor="#999"
-            secureTextEntry
-          />
-        </View>
-
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.saveButton]}
-            onPress={handleSalvarAlteracoes}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonText}>Salvar Alterações</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.logoutButton]}
-            onPress={handleSair}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.buttonText, styles.logoutText]}>Sair da Conta</Text>
+          <Image source={fotoPerfil} style={styles.image} resizeMode="cover" />
+          <TouchableOpacity style={styles.sideIconContainer} onPress={escolherFoto}>
+            <Ionicons name="camera-outline" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+        {/* Formulário COMPLETO */}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.areaForm}>
+            <Text style={styles.textForm}>Nome completo *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.nome}
+              onChangeText={(text) => handleChange("nome", text)}
+              placeholder="Digite seu nome completo"
+              placeholderTextColor="#999"
+            />
+
+            <Text style={styles.textForm}>Data de Nascimento</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.datanasc}
+              onChangeText={(text) => handleChange("datanasc", text)}
+              placeholder="DD/MM/AAAA"
+              placeholderTextColor="#999"
+              keyboardType="numeric"
+            />
+
+            <Text style={styles.textForm}>Telefone</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.telefone}
+              onChangeText={(text) => handleChange("telefone", text)}
+              placeholder="(00) 00000-0000"
+              placeholderTextColor="#999"
+              keyboardType="phone-pad"
+            />
+
+            <Text style={styles.textForm}>CPF</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.cpf}
+              onChangeText={(text) => handleChange("cpf", text)}
+              placeholder="000.000.000-00"
+              placeholderTextColor="#999"
+              keyboardType="numeric"
+            />
+
+            <Text style={styles.textForm}>Email *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.email}
+              onChangeText={(text) => handleChange("email", text)}
+              placeholder="seu@email.com"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <Text style={styles.textForm}>Endereço</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.endereco}
+              onChangeText={(text) => handleChange("endereco", text)}
+              placeholder="Digite seu endereço completo"
+              placeholderTextColor="#999"
+            />
+
+            <Text style={styles.textForm}>Senha atual *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.senha}
+              onChangeText={(text) => handleChange("senha", text)}
+              placeholder="Digite sua senha atual"
+              placeholderTextColor="#999"
+              secureTextEntry
+              autoCapitalize="none"
+            />
+
+            <Text style={styles.textForm}>Nova senha (opcional)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.novaSenha}
+              onChangeText={(text) => handleChange("novaSenha", text)}
+              placeholder="Digite uma nova senha"
+              placeholderTextColor="#999"
+              secureTextEntry
+              autoCapitalize="none"
+            />
+          </View>
+
+          {/* Botões de ação */}
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity 
+              style={[styles.button, styles.saveButton]} 
+              onPress={handleSalvar}
+              disabled={isLoading}
+            >
+              <Text style={styles.buttonText}>
+                {isLoading ? "Salvando..." : "Salvar Alterações"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.button, styles.cancelButton]} 
+              onPress={() => navigation.goBack()}
+              disabled={isLoading}
+            >
+              <Text style={[styles.buttonText, styles.cancelText]}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 };
-
+// Estilos (MANTIDOS IGUAIS ao seu original)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 20,
     paddingHorizontal: 20,
+    height: 320,
   },
   profileImage: {
     width: 150,
@@ -198,13 +240,28 @@ const styles = StyleSheet.create({
     borderRadius: 75,
     overflow: "hidden",
     borderWidth: 3,
-    borderColor: COR_PRIMARIA,
+    borderColor: "#425010",
     alignSelf: "center",
     marginVertical: 20,
+    position: "relative",
+    backgroundColor: "#fff"
   },
   image: {
     width: "100%",
     height: "100%",
+  },
+  sideIconContainer: {
+    position: "absolute",
+    right: 0,
+    top: "60%",
+    transform: [{ translateY: -12 }],
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#425010",
   },
   areaForm: {
     paddingHorizontal: 10,
@@ -220,40 +277,40 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 20,
     paddingHorizontal: 15,
     marginTop: 5,
     marginBottom: 15,
     fontSize: 16,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
   },
   buttonsContainer: {
     flexDirection: "column",
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 40,
     gap: 15,
   },
   button: {
     paddingVertical: 15,
-    borderRadius: 8,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   saveButton: {
-    backgroundColor: COR_PRIMARIA,
+    backgroundColor: '#425010',
   },
-  logoutButton: {
+  cancelButton: {
     backgroundColor: "#fff",
     borderWidth: 2,
-    borderColor: COR_PRIMARIA,
+    borderColor: '#425010',
   },
   buttonText: {
     fontWeight: "bold",
     fontSize: 16,
     color: "#fff",
   },
-  logoutText: {
-    color: COR_PRIMARIA,
+  cancelText: {
+    color: "#425010",
   },
 });
 

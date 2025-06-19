@@ -15,7 +15,7 @@ const DrawerRoutes = () => {
     return (
     <Drawer.Navigator 
         screenOptions={{
-            headerShown:false,
+            headerShown:true,
             drawerStyle:{
             width: 250,
             height: '100%',

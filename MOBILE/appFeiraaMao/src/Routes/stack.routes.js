@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,7 +11,7 @@ const Stack = createNativeStackNavigator();
 
 function StackNavigator(){
     return (
-        <Stack.Navigator screenOptions={{headerShown: false}}>   
+        <Stack.Navigator screenOptions={{headerShown: true}}>   
 
             <Stack.Screen name="Home" component={DrawerRoutes} />                     
             <Stack.Screen name="Cadastro" component={Cadastro} /> 

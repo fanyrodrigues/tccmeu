@@ -78,7 +78,7 @@ export default function Cadastro({ navigation }) {
           </View>
         </Animated.View>
         <TouchableOpacity onPress={() => {navigation.navigate("Login")}}>
-              <Text style={styles.textForm}>Já possue uma conta? Faça o Login</Text>
+              <Text style={styles.textLink}>Já possue uma conta? Faça o Login</Text>
             </TouchableOpacity>
       </KeyboardAvoidingView>
     </ImageBackground>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     fontFamily: "MontserratAlternates-Regular",
     color: "#f5f5f5",
     textAlign: "right",
-    marginTop: 44,
+    marginTop: 15,
   },
 
   subTitulo: {
@@ -123,10 +123,17 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginTop: 15,
   },
+  textLink: {
+    fontSize: 15,
+    fontFamily: "MontserratAlternates-Regular",
+    color: "#f5f5f5",
+    textAlign: "left",
+    marginBottom: 15
+  },
 
   formulario: {
     flex: 1,
-    paddingBottom: 30,
+    paddingBottom: 25,
     justifyContent: "center",
     alignItems: "center",
     width: "90%",

@@ -5,29 +5,35 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
+  ImageBackground,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const Cadastro = () => {
   const navigation = useNavigation();
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeContainer}>
         <View style={styles.containerPrincipal}>
-          {/* Container Interno */}
-          <View style={styles.containerInterno}>
-            <Text style={styles.texto}> Para começar, faça o cadastro como feirante e preencha algumas informações necessárias</Text>
-          </View>
-
+          <ImageBackground
+            source={require("../../../../assets/img/fundo-perfil.png")}
+            style={styles.imageBackground}
+            imageStyle={styles.imageStyle}
+          >
+            <View style={styles.containerInterno}>
+              <Text style={styles.texto}>
+                Para começar, faça o cadastro como feirante e preencha algumas informações necessárias
+              </Text>
+            </View>
+          </ImageBackground>
         </View>
 
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Continuar")}
+            onPress={() => navigation.navigate("tipoloja")}
           >
             <Text style={styles.buttonText}>Continuar</Text>
           </TouchableOpacity>
@@ -38,47 +44,52 @@ const Cadastro = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeContainer: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#fff",
   },
   containerPrincipal: {
-    backgroundColor: '#dcdcdc',
-    padding: 20,
-    borderRadius: 10,
-        flex: 1,
-        padding: 16,
-        justifyContent: 'space-between', // isso separa o conteúdo e o botão ao máximo
-      
-      
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  imageBackground: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageStyle: {
+    resizeMode: "cover",
   },
   containerInterno: {
-    backgroundColor: '#ffffff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  texto: {
-    fontSize: 16,
-    color: '#333',
-  },
-  textoInformativo: {
-    fontSize: 16,
-    marginTop: 10,
-  },
-  buttonsContainer: {
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: '#8095',
+    backgroundColor: "#404A22",
     padding: 20,
     borderRadius: 8,
-    alignItems: 'center',
+    opacity: 0.9,
+    maxWidth: 300,
+  },
+  texto: {
+    fontSize: 18,
+    color: "#fff",
+    textAlign: "center",
+  },
+  buttonsContainer: {
+    padding: 16,
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#404A22",
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
